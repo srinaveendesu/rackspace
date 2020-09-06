@@ -21,3 +21,21 @@ def validator(db, data):
     if flag:
         return 'Company is being added to DB', data, flag
     
+def find_company(db,data):
+    flag = False
+    full_keys = list(db.keys())
+    full_values = list(db.values())
+    name_keys = list(zip(*full_keys))
+    index = 0
+    if data['name'].capitalize() in name_keys[0]:
+        flag = True
+        index = name_keys[0].index(data['name'].capitalize())
+    for val in full_values:
+        print('validator')
+        print(val.name, val.domain)
+
+    if flag:
+        return full_keys[index], data, flag
+    else:
+        return None, data, flag
+    
