@@ -34,6 +34,9 @@ async def store_company_views(companies):
             company_data = clearbit.Company.find(domain=company.domain, stream=True)
             if company.name.lower() == company_data['name'].lower():
                 messages[(company.name.capitalize(), company_data['id'])] = company
+            # Issue: In case when kafka is down/unable to receive messages,
+            #         asynchronous publishing will fail.
+            # TODO: Can be extended to Synchronized/Asynchronized
             await domain_info_topic.send(value={'clearbitData':company_data,
                                                 'name':company.name})
         except requests.exceptions.HTTPError:
@@ -53,14 +56,6 @@ async def store_domaininfo_views(domain_info):
             if company_table[c_name]["comp_id"] == company_id:
                 flag = False
                 print(f'Company already exists {c_name}')
-                #messages.pop(info.name, 'No Key found')
-                # print('Deleting duplicate record',info.name,company_table[c_name]["comp_id"])
-                # print(company_table)
-                # print(type(company_table))
-                # print(company_table.as_ansitable())
-                # print('taking a break')
-                # print(c_name)
-                #company_table.pop(c_name, 'No Key found')
                 break
         print(messages)
         if flag:
@@ -101,16 +96,6 @@ class counter(View):
         else:
             return self.json({'processed': False,'exists': True})
     
-    # async def delete(self, request):
-    #     body = await request.json()
-    #     key, body, flag = find_company(messages, body)
-        
-    #     if flag:
-    #         company_table.pop(key, 'No Key found')
-    #         messages.pop(key, 'No Key found')
-    #         return self.json({'Deleted': True,'exists': True})
-    #     else:
-    #         return self.json({'Deleted': False,'exists': False})
 
 @app.page('/companies/{name}')
 @app.table_route(table=company_table, match_info='name')
