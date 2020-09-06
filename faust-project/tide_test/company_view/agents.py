@@ -94,7 +94,7 @@ class counter(View):
             await companies_topic.send(value=body)
             return self.json({'processed': True,'exists': False})
         else:
-            return self.json({'processed': False,'exists': True})
+            return self.json({'processed': False,'Error': msg})
     
 
 @app.page('/companies/{name}')

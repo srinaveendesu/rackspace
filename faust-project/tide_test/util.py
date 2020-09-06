@@ -12,6 +12,10 @@ def validate_domain(doman_name):
 
 def validator(db, data):
     flag = False
+    resp_data = ['name','domain']
+    resp_lst =filter(lambda x:x not in resp_data,list(data.keys()))
+    if len(list(resp_lst)) != 0:
+        return 'Invalid request data', data, flag
     if data['name'].lower() in db.keys():
         return 'Company already exists in DB', data, flag
     val_domain = validate_domain(data['domain'])
